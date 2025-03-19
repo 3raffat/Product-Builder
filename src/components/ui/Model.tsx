@@ -5,6 +5,7 @@ import Input from "./Input";
 import { formInputsList } from "../../data";
 
 import { IProduct } from "../../interfaces";
+import { ProductValidation } from "../../validations";
 
 function Model() {
   const defaultProductObj = {
@@ -20,7 +21,7 @@ function Model() {
   };
   /* __________________State_____________________*/
   const [Product, SetProduct] = useState<IProduct>(defaultProductObj);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   function open() {
     setIsOpen(true);
@@ -39,7 +40,18 @@ function Model() {
     });
   };
 
-  const SubmitHandler = (e: FormEvent<HTMLFormElement>) => {};
+  const SubmitHandler = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { title, description, imageURL, price } = Product;
+
+    const errors = ProductValidation({ title, description, price, imageURL });
+    const HasError =
+      Object.values(errors).some((val) => val == "") &&
+      Object.values(errors).every((val) => val == "");
+    if (!HasError) {
+      return;
+    }
+  };
 
   /* __________________RENDER____________________*/
   const FrrmListRender = formInputsList.map((input) => (
@@ -54,7 +66,6 @@ function Model() {
       />
     </div>
   ));
-  console.log(Product);
 
   return (
     <>
@@ -86,25 +97,25 @@ function Model() {
               </DialogTitle>
               <form className=" space-y-4 " onSubmit={SubmitHandler}>
                 {FrrmListRender}
+                <div className=" flex space-x-2 mt-6">
+                  <Button
+                    type="submit"
+                    className=" items-center gap-2 rounded-md bg-green-600 hover:bg-green-800 p-3 text-md font-semibold text-black"
+                    width="w-full"
+                  >
+                    SUPMIT
+                  </Button>
+                  <Button
+                    className=" items-center gap-2 rounded-md bg-red-600 hover:bg-red-800 p-3 text-md font-semibold text-black"
+                    onClick={close}
+                    width="w-full"
+                  >
+                    CANCLE
+                  </Button>
+                </div>
               </form>
 
               {/* <MultiSelect /> */}
-              <div className=" flex space-x-2 mt-6">
-                <Button
-                  type="submit"
-                  className=" items-center gap-2 rounded-md bg-green-600 hover:bg-green-800 p-3 text-md font-semibold text-black"
-                  width="w-full"
-                >
-                  SUPMIT
-                </Button>
-                <Button
-                  className=" items-center gap-2 rounded-md bg-red-600 hover:bg-red-800 p-3 text-md font-semibold text-black"
-                  onClick={close}
-                  width="w-full"
-                >
-                  CANCLE
-                </Button>
-              </div>
             </DialogPanel>
           </div>
         </div>
