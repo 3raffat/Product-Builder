@@ -1,11 +1,12 @@
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, use, useState } from "react";
 import Button from "./Buttom";
 import Input from "./Input";
 import { formInputsList } from "../../data";
 
 import { IProduct } from "../../interfaces";
 import { ProductValidation } from "../../validations";
+import ErrorMsg from "./ErrorMsg";
 
 function Model() {
   const defaultProductObj = {
@@ -22,8 +23,20 @@ function Model() {
   /* __________________State_____________________*/
   const [Product, SetProduct] = useState<IProduct>(defaultProductObj);
   const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState({
+    title: "",
+    description: "",
+    imageURL: "",
+    price: "",
+  });
 
   function open() {
+    setError({
+      title: "",
+      description: "",
+      imageURL: "",
+      price: "",
+    });
     setIsOpen(true);
   }
 
@@ -38,6 +51,10 @@ function Model() {
       ...Product,
       [name]: value,
     });
+    setError({
+      ...error,
+      [name]: "",
+    });
   };
 
   const SubmitHandler = (e: FormEvent<HTMLFormElement>) => {
@@ -49,6 +66,7 @@ function Model() {
       Object.values(errors).some((val) => val == "") &&
       Object.values(errors).every((val) => val == "");
     if (!HasError) {
+      setError(errors);
       return;
     }
   };
@@ -64,6 +82,7 @@ function Model() {
         value={Product[input.name]}
         onChange={onChangeHandler}
       />
+      <ErrorMsg Msg={error[input.name]} />
     </div>
   ));
 
@@ -114,8 +133,6 @@ function Model() {
                   </Button>
                 </div>
               </form>
-
-              {/* <MultiSelect /> */}
             </DialogPanel>
           </div>
         </div>
